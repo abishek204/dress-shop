@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Badge } from 'react-bootstrap';
-import axios from 'axios';
+import api, { API_URL } from '../api/config';
 import { ShoppingCart, ArrowLeft, Star, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 
@@ -18,7 +18,7 @@ const ProductDetailsPage = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const { data } = await axios.get(`http://localhost:5000/api/products/${id}`);
+                const { data } = await api.get(`/api/products/${id}`);
                 setProduct(data);
                 if (data.sizes && data.sizes.length > 0) {
                     setSelectedSize(data.sizes[0]);
@@ -41,7 +41,7 @@ const ProductDetailsPage = () => {
     const getImagePath = (path) => {
         if (!path) return 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=500';
         if (path.startsWith('http')) return path;
-        return `http://localhost:5000${path.startsWith('/') ? '' : '/'}${path}`;
+        return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
     };
 
     if (loading) return <div className="text-center py-5">Loading...</div>;

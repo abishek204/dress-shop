@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { Container, Table, Badge, Button, Card } from 'react-bootstrap';
-import axios from 'axios';
+import api from '../api/config';
 import { ShoppingBag, Package, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -14,7 +14,7 @@ const MyOrdersPage = () => {
         const fetchOrders = async () => {
             try {
                 // Using the local API - this will be intercepted by Demo Mode if DB is down
-                const { data } = await axios.get('http://localhost:5000/api/orders/myorders', {
+                const { data } = await api.get('/api/orders/myorders', {
                     headers: { Authorization: `Bearer ${user.token}` }
                 });
                 setOrders(data);

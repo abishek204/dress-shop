@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
-import axios from 'axios';
+import api from '../api/config';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
 import { Search, ShoppingBag } from 'lucide-react';
@@ -41,7 +41,7 @@ const ProductsPage = () => {
             setLoading(true);
             setProducts([]); // Clear old products IMMEDIATELY
             try {
-                const { data } = await axios.get(`http://localhost:5000/api/products?category=${selectedCategory}`);
+                const { data } = await api.get(`/api/products?category=${selectedCategory}`);
                 console.log(`[DEBUG] API Response Length: ${data.length} items`);
                 setProducts(data); // Overwrite state
                 setVisibleItems(20);

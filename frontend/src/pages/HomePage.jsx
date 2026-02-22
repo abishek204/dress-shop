@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/config';
 import ProductCard from '../components/product/ProductCard';
 import { ArrowRight } from 'lucide-react';
 
@@ -11,7 +11,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/products');
+                const { data } = await api.get('/api/products');
                 setFeaturedProducts(data.slice(0, 4));
             } catch (error) {
                 console.error('Error fetching products:', error);

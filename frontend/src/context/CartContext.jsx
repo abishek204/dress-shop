@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
-import axios from 'axios';
+import api from '../api/config';
 
 export const CartContext = createContext();
 
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
             const config = {
                 headers: { Authorization: `Bearer ${user.token}` },
             };
-            const { data } = await axios.get('http://localhost:5000/api/cart', config);
+            const { data } = await api.get('/api/cart', config);
             setCartItems(data.items || []);
         } catch (error) {
             console.error('Error fetching cart:', error);
@@ -53,7 +53,7 @@ export const CartProvider = ({ children }) => {
                 const config = {
                     headers: { Authorization: `Bearer ${user.token}` },
                 };
-                const { data } = await axios.post('http://localhost:5000/api/cart', {
+                const { data } = await api.post('/api/cart', {
                     productId: product._id,
                     name: product.name,
                     image: product.images[0],
@@ -98,7 +98,7 @@ export const CartProvider = ({ children }) => {
                 const config = {
                     headers: { Authorization: `Bearer ${user.token}` },
                 };
-                const { data } = await axios.delete(`http://localhost:5000/api/cart/${itemId}`, config);
+                const { data } = await api.delete(`/api/cart/${itemId}`, config);
                 setCartItems(data.items || []);
             } catch (error) {
                 console.error('Error removing from cart:', error);

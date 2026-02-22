@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { useContext, useState } from 'react';
 import { CartContext } from '../../context/CartContext';
+import { API_URL } from '../../api/config';
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useContext(CartContext);
@@ -20,7 +21,7 @@ const ProductCard = ({ product }) => {
     const getImagePath = (path) => {
         if (!path) return fallbackImage;
         if (path.startsWith('http')) return path;
-        return `http://localhost:5000${path.startsWith('/') ? '' : '/'}${path}`;
+        return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
     };
 
     return (

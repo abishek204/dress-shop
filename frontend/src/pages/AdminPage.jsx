@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Table, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
 import { Settings, Trash2, Edit2, Plus, Package, X, Save } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/config';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,7 +41,7 @@ const AdminPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/products');
+            const { data } = await api.get('/api/products');
             setProducts(data);
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -87,7 +87,7 @@ const AdminPage = () => {
             const config = {
                 headers: { Authorization: `Bearer ${user.token}` }
             };
-            await axios.delete(`http://localhost:5000/api/products/${selectedProduct._id}`, config);
+            await api.delete(`/api/products/${selectedProduct._id}`, config);
             setProducts(products.filter(p => p._id !== selectedProduct._id));
             setMessage({ type: 'success', text: 'Product deleted successfully!' });
             setShowDeleteModal(false);
@@ -109,8 +109,8 @@ const AdminPage = () => {
             };
 
             if (showEditModal) {
-                const { data } = await axios.put(
-                    `http://localhost:5000/api/products/${selectedProduct._id}`,
+                const { data } = await api.put(
+                    `/api/products/${selectedProduct._id}`,
                     productData,
                     config
                 );
@@ -118,7 +118,7 @@ const AdminPage = () => {
                 setMessage({ type: 'success', text: 'Product updated successfully!' });
                 setShowEditModal(false);
             } else {
-                const { data } = await axios.post('http://localhost:5000/api/products', productData, config);
+                const { data } = await api.post('/api/products', productData, config);
                 setProducts([...products, data]);
                 setMessage({ type: 'success', text: 'Product added successfully!' });
                 setShowAddModal(false);
