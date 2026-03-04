@@ -14,7 +14,7 @@ const ProductsPage = () => {
     const [loading, setLoading] = useState(true);
     const [visibleItems, setVisibleItems] = useState(20);
 
-    const categories = ['all', 'casual', 'party', 'traditional', 'formal', 'summer', 'wedding'];
+    const categories = ['all', 'casual', 'party', 'traditional', 'formal', 'blouse', 'wedding'];
 
     useEffect(() => {
         if (cat) {
@@ -25,8 +25,9 @@ const ProductsPage = () => {
                 'partywear': 'party',
                 'traditional': 'traditional',
                 'formal': 'formal',
-                'summer': 'summer',
-                'summerdress': 'summer',
+                'summer': 'blouse',
+                'summerdress': 'blouse',
+                'blouse': 'blouse',
                 'wedding': 'wedding'
             };
             setSelectedCategory(catMap[cat.toLowerCase()] || 'all');

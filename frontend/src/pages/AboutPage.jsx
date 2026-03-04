@@ -34,7 +34,7 @@ const AboutPage = () => {
                     <Col lg={6} className="ps-lg-5">
                         <h2 className="fw-bold mb-4">Blending Tradition with Modernity</h2>
                         <p className="text-secondary fs-5 mb-4">
-                            Founded in 2024, <strong>DressMe</strong> started with a simple vision: to bring the rich, intricate beauty of Indian ethnic wear to the global stage while embracing the sleek silhouettes of Western fashion.
+                            Founded in 2024, <strong>Dreamee shaz</strong> started with a simple vision: to bring the rich, intricate beauty of Indian ethnic wear to the global stage while embracing the sleek silhouettes of Western fashion.
                         </p>
                         <p className="text-secondary fs-5 mb-4">
                             We believe that every dress tells a story. From the hand-woven Banarasi silks to the precisely tailored formal blazers, our collection is curated for the modern individual who values both heritage and style.
@@ -96,7 +96,7 @@ const AboutPage = () => {
                     <Col lg={4}>
                         <Card className="border-0 bg-secondary text-white p-4 h-100 rounded-4 shadow">
                             <h3 className="fw-bold mb-4 mt-2">Pan-India Delivery</h3>
-                            <p className="opacity-75 mb-0">No matter where you are, the elegance of DressMe is just a click away from your doorstep.</p>
+                            <p className="opacity-75 mb-0">No matter where you are, the elegance of Dreamee shaz is just a click away from your doorstep.</p>
                         </Card>
                     </Col>
                 </Row>

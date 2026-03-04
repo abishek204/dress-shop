@@ -12,7 +12,7 @@ const getProducts = async (req, res) => {
             query.category = category.toLowerCase();
         }
 
-        const products = await Product.find(query);
+        const products = await Product.findAll({ where: query });
         console.log(`[API] Category: ${category || 'all'} | Found: ${products.length} products`);
         res.json(products);
     } catch (error) {
@@ -25,7 +25,7 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findByPk(req.params.id);
 
         if (product) {
             res.json(product);
@@ -44,19 +44,18 @@ const createProduct = async (req, res) => {
     const { name, price, description, images, category, countInStock, sizes, colors } = req.body;
 
     try {
-        const product = new Product({
+        const createdProduct = await Product.create({
             name,
             price,
-            user: req.user._id,
-            images,
+            user: req.user.id,
+            images: images || [],
             category,
             countInStock,
             description,
-            sizes,
-            colors
+            sizes: sizes || [],
+            colors: colors || []
         });
 
-        const createdProduct = await product.save();
         res.status(201).json(createdProduct);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -70,7 +69,7 @@ const updateProduct = async (req, res) => {
     const { name, price, description, images, category, countInStock, sizes, colors } = req.body;
 
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findByPk(req.params.id);
 
         if (product) {
             product.name = name || product.name;
@@ -78,7 +77,7 @@ const updateProduct = async (req, res) => {
             product.description = description || product.description;
             product.images = images || product.images;
             product.category = category || product.category;
-            product.countInStock = countInStock || product.countInStock;
+            product.countInStock = countInStock !== undefined ? countInStock : product.countInStock;
             product.sizes = sizes || product.sizes;
             product.colors = colors || product.colors;
 
@@ -97,10 +96,10 @@ const updateProduct = async (req, res) => {
 // @access  Private/Admin
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findByPk(req.params.id);
 
         if (product) {
-            await product.deleteOne();
+            await product.destroy();
             res.json({ message: 'Product removed' });
         } else {
             res.status(404).json({ message: 'Product not found' });

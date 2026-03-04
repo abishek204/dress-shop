@@ -35,11 +35,11 @@ const CategoriesPage = () => {
             path: 'formal'
         },
         {
-            name: 'Summer Dress',
-            count: 'Light & Breezy',
-            image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&q=80&w=800',
-            description: 'Stay cool and stylish with our lightweight breathable summer cotton dress collection.',
-            path: 'summer'
+            name: 'Stretchable Blouse',
+            count: 'Comfort & Style',
+            image: 'https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80&w=800',
+            description: 'Perfectly fitting stretchable blouses for every saree and occasion.',
+            path: 'blouse'
         },
         {
             name: 'Wedding',

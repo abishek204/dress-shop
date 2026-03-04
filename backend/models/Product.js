@@ -1,48 +1,39 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-const productSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: [true, 'Please add a product name'],
-        unique: true,
-        trim: true,
+const Product = sequelize.define('Product', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
     },
-    description: {
-        type: String,
-        required: [true, 'Please add a description'],
+    _id: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.id;
+        }
     },
-    price: {
-        type: Number,
-        required: [true, 'Please add a price'],
+    name: { type: DataTypes.STRING, allowNull: false, unique: true },
+    description: { type: DataTypes.TEXT, allowNull: false },
+    price: { type: DataTypes.FLOAT, allowNull: false },
+    category: { type: DataTypes.STRING, allowNull: false },
+    images: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: []
     },
-    category: {
-        type: String,
-        required: [true, 'Please add a category'],
-        enum: ['casual', 'formal', 'party', 'traditional', 'summer', 'wedding'],
+    user: {
+        type: DataTypes.UUID,
     },
-    images: [{
-        type: String,
-        required: true,
-    }],
-    sizes: [String],
-    colors: [String],
-    countInStock: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-    rating: {
-        type: Number,
-        default: 0,
-    },
-    numReviews: {
-        type: Number,
-        default: 0,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
+    sizes: { type: DataTypes.JSON, defaultValue: [] },
+    colors: { type: DataTypes.JSON, defaultValue: [] },
+    countInStock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    rating: { type: DataTypes.FLOAT, defaultValue: 0 },
+    numReviews: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, {
+    // This ensures VIRTUALS are included in JSON
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = Product;

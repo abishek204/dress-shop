@@ -5,11 +5,11 @@ const Cart = require('../models/Cart');
 // @access  Private
 const getCart = async (req, res) => {
     try {
-        const cart = await Cart.findOne({ user: req.user._id });
+        const cart = await Cart.findOne({ where: { user: req.user.id } });
         if (cart) {
             res.json(cart);
         } else {
-            res.json({ user: req.user._id, items: [] });
+            res.json({ user: req.user.id, items: [] });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -23,26 +23,27 @@ const addToCart = async (req, res) => {
     const { productId, name, image, price, quantity, size } = req.body;
 
     try {
-        let cart = await Cart.findOne({ user: req.user._id });
+        let cart = await Cart.findOne({ where: { user: req.user.id } });
 
         if (cart) {
-            // Check if item already exists in cart
-            const itemIndex = cart.items.findIndex(item => item.product.toString() === productId && item.size === size);
+            // Sequelize JSON fields might need distinct assignment or deep cloning
+            let items = [...cart.items];
+            const itemIndex = items.findIndex(item => item.product === productId && item.size === size);
 
             if (itemIndex > -1) {
                 // Item exists, update quantity
-                cart.items[itemIndex].quantity += quantity;
+                items[itemIndex].quantity += quantity;
             } else {
                 // Item does not exist, push new item
-                cart.items.push({ product: productId, name, image, price, quantity, size });
+                items.push({ product: productId, name, image, price, quantity, size });
             }
-            cart.updatedAt = Date.now();
+            cart.items = items;
             await cart.save();
             res.status(200).json(cart);
         } else {
             // Create new cart for user
             const newCart = await Cart.create({
-                user: req.user._id,
+                user: req.user.id,
                 items: [{ product: productId, name, image, price, quantity, size }]
             });
             res.status(201).json(newCart);
@@ -57,10 +58,11 @@ const addToCart = async (req, res) => {
 // @access  Private
 const removeFromCart = async (req, res) => {
     try {
-        let cart = await Cart.findOne({ user: req.user._id });
+        let cart = await Cart.findOne({ where: { user: req.user.id } });
 
         if (cart) {
-            cart.items = cart.items.filter(item => item._id.toString() !== req.params.itemId);
+            let items = cart.items.filter(item => item.product !== req.params.itemId && item._id !== req.params.itemId);
+            cart.items = items;
             await cart.save();
             res.json(cart);
         } else {
@@ -76,7 +78,7 @@ const removeFromCart = async (req, res) => {
 // @access  Private
 const clearCart = async (req, res) => {
     try {
-        let cart = await Cart.findOne({ user: req.user._id });
+        let cart = await Cart.findOne({ where: { user: req.user.id } });
 
         if (cart) {
             cart.items = [];

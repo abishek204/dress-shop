@@ -1,71 +1,80 @@
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Product = require('./models/Product');
 const User = require('./models/User');
+const sequelize = require('./config/db');
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/dress-website');
-
 const products = [
     {
-        name: 'Floral Summer Dress',
-        images: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&q=80&w=800'],
-        description: 'A beautiful floral dress perfect for summer outings. Lightweight and breathable fabric.',
-        category: 'summer',
-        price: 49.99,
+        name: 'Royal Indian Saree',
+        images: ['https://plus.unsplash.com/premium_photo-1671131753965-f938c03e3368?auto=format&fit=crop&q=80&w=800'],
+        description: 'Exquisite silk saree with intricate gold patterns. Perfect for weddings and festivals.',
+        category: 'traditional',
+        price: 4999,
+        countInStock: 10,
+        sizes: ['Free Size'],
+        colors: ['Red', 'Gold'],
+    },
+    {
+        name: 'Designer Lehengas',
+        images: ['https://images.unsplash.com/photo-1603522784534-1925b6826500?auto=format&fit=crop&q=80&w=800'],
+        description: 'Premium designer lehenga for a glamorous ethnic look.',
+        category: 'party',
+        price: 7999,
+        countInStock: 5,
+        sizes: ['S', 'M', 'L'],
+        colors: ['Pink', 'Maroon'],
+    },
+    {
+        name: 'Cotton Casual Kurti',
+        images: ['https://images.unsplash.com/photo-1610030469983-98ef80b66a92?auto=format&fit=crop&q=80&w=800'],
+        description: 'Comfortable everyday cotton kurti with trendy prints.',
+        category: 'casual',
+        price: 899,
+        countInStock: 25,
+        sizes: ['M', 'L', 'XL', 'XXL'],
+        colors: ['White', 'Blue'],
+    },
+    {
+        name: 'Elegant Anarkali Gown',
+        images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=800'],
+        description: 'Stunning floor-length Anarkali dress for special occasions.',
+        category: 'traditional',
+        price: 2499,
         countInStock: 15,
         sizes: ['S', 'M', 'L'],
-        colors: ['Pink', 'Blue'],
+        colors: ['Yellow', 'Green'],
     },
     {
-        name: 'Elegant Evening Gown',
-        images: ['https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&q=80&w=800'],
-        description: 'Stunning evening gown for formal events. High-quality satin finish.',
-        category: 'formal',
-        price: 129.99,
-        countInStock: 10,
-        sizes: ['M', 'L', 'XL'],
-        colors: ['Navy', 'Black'],
-    },
-    {
-        name: 'Sparkly Party Dress',
-        images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=800'],
-        description: 'Get ready to shine in this sparkly cocktail dress. Perfect for parties.',
-        category: 'party',
-        price: 79.99,
-        countInStock: 20,
-        sizes: ['XS', 'S', 'M'],
-        colors: ['Gold', 'Silver'],
-    },
-    {
-        name: 'Boho Casual Dress',
-        images: ['https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&q=80&w=800'],
-        description: 'Relaxed bohemian style dress for everyday comfort.',
-        category: 'casual',
-        price: 34.99,
-        countInStock: 25,
+        name: 'Classic Stretchable Blouse',
+        images: ['https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80&w=800'],
+        description: 'High-quality stretchable material for ultimate comfort and perfect fit. Pairs beautifully with any saree.',
+        category: 'blouse',
+        price: 499,
+        countInStock: 50,
         sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Beige', 'White'],
-    },
-    {
-        name: 'Lace Wedding Dress',
-        images: ['https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=800'],
-        description: 'Exquisite lace wedding dress with a long train. Elegant and timeless.',
-        category: 'wedding',
-        price: 999.99,
-        countInStock: 5,
-        sizes: ['S', 'M'],
-        colors: ['Ivory', 'White'],
+        colors: ['Black', 'Gold', 'Red'],
     },
 ];
 
+const adminUser = {
+    name: 'Admin User',
+    email: 'admin@example.com',
+    password: 'password123',
+    role: 'admin'
+};
+
 const importData = async () => {
     try {
-        await Product.deleteMany();
-        await Product.insertMany(products);
+        await sequelize.sync();
+        await Product.destroy({ where: {} });
+        await User.destroy({ where: { role: 'admin' } }); // Don't wipe all users, just seeded admin if exists
 
-        console.log('Data Imported!');
+        await Product.bulkCreate(products);
+        await User.create(adminUser);
+
+        console.log('✅ Data Imported (Admin: admin@example.com / password123)');
         process.exit();
     } catch (error) {
         console.error(`${error}`);

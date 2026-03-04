@@ -9,15 +9,17 @@ const AdminPage = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [activeTab, setActiveTab] = useState('products');
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState({ type: '', text: '' });
-    
+
     // Modal states
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    
+
     // Form states
     const [formData, setFormData] = useState({
         name: '',
@@ -36,8 +38,26 @@ const AdminPage = () => {
         if (user && user.role !== 'admin') {
             navigate('/');
         }
-        fetchProducts();
+        fetchData();
     }, [user, navigate]);
+
+    const fetchData = async () => {
+        setLoading(true);
+        await Promise.all([fetchProducts(), fetchOrders()]);
+        setLoading(false);
+    };
+
+    const fetchOrders = async () => {
+        try {
+            const config = {
+                headers: { Authorization: `Bearer ${user.token}` }
+            };
+            const { data } = await api.get('/api/orders', config);
+            setOrders(data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
@@ -172,6 +192,24 @@ const AdminPage = () => {
                     </Button>
                 </div>
 
+                {/* Tab Navigation */}
+                <div className="d-flex gap-3 mb-4">
+                    <Button
+                        variant={activeTab === 'products' ? 'primary' : 'outline-primary'}
+                        className="rounded-pill px-4 fw-bold"
+                        onClick={() => setActiveTab('products')}
+                    >
+                        Products ({products.length})
+                    </Button>
+                    <Button
+                        variant={activeTab === 'orders' ? 'primary' : 'outline-primary'}
+                        className="rounded-pill px-4 fw-bold"
+                        onClick={() => setActiveTab('orders')}
+                    >
+                        Orders ({orders.length})
+                    </Button>
+                </div>
+
                 {message.text && (
                     <Alert variant={message.type} className="mb-4">{message.text}</Alert>
                 )}
@@ -202,82 +240,140 @@ const AdminPage = () => {
                     </Col>
                 </Row>
 
-                {/* Products Table */}
-                <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
-                    <Card.Header className="bg-white py-3 px-4 border-bottom">
-                        <h5 className="fw-bold mb-0">
-                            <Package size={20} className="me-2" /> All Products
-                        </h5>
-                    </Card.Header>
-                    {loading ? (
-                        <div className="text-center py-5">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Loading...</span>
+                {activeTab === 'products' ? (
+                    <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+                        <Card.Header className="bg-white py-3 px-4 border-bottom">
+                            <h5 className="fw-bold mb-0">
+                                <Package size={20} className="me-2" /> All Products
+                            </h5>
+                        </Card.Header>
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="table-responsive">
-                            <Table hover className="mb-0 align-middle">
-                                <thead className="bg-light">
-                                    <tr>
-                                        <th className="px-4 py-3">Image</th>
-                                        <th className="py-3">Name</th>
-                                        <th className="py-3">Category</th>
-                                        <th className="py-3">Price</th>
-                                        <th className="py-3">Stock</th>
-                                        <th className="py-3 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.map((product) => (
-                                        <tr key={product._id}>
-                                            <td className="px-4 py-3">
-                                                <img
-                                                    src={product.images?.[0] || 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=100'}
-                                                    alt={product.name}
-                                                    className="rounded-3"
-                                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                                />
-                                            </td>
-                                            <td className="py-3">
-                                                <strong>{product.name}</strong>
-                                            </td>
-                                            <td className="py-3">
-                                                <Badge bg="light" text="primary" className="px-3 py-2 rounded-pill">
-                                                    {product.category}
-                                                </Badge>
-                                            </td>
-                                            <td className="py-3 fw-bold">₹{product.price}</td>
-                                            <td className="py-3">
-                                                <Badge bg={product.countInStock > 0 ? 'success' : 'danger'} className="px-3 py-2 rounded-pill">
-                                                    {product.countInStock > 0 ? `${product.countInStock} in stock` : 'Out of stock'}
-                                                </Badge>
-                                            </td>
-                                            <td className="py-3 text-center">
-                                                <Button
-                                                    variant="outline-primary"
-                                                    size="sm"
-                                                    className="me-2 rounded-pill px-3"
-                                                    onClick={() => handleEdit(product)}
-                                                >
-                                                    <Edit2 size={14} className="me-1" /> Edit
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    className="rounded-pill px-3"
-                                                    onClick={() => handleDelete(product)}
-                                                >
-                                                    <Trash2 size={14} className="me-1" /> Delete
-                                                </Button>
-                                            </td>
+                        ) : (
+                            <div className="table-responsive">
+                                <Table hover className="mb-0 align-middle">
+                                    <thead className="bg-light">
+                                        <tr>
+                                            <th className="px-4 py-3">Image</th>
+                                            <th className="py-3">Name</th>
+                                            <th className="py-3">Category</th>
+                                            <th className="py-3">Price</th>
+                                            <th className="py-3">Stock</th>
+                                            <th className="py-3 text-center">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        </div>
-                    )}
-                </Card>
+                                    </thead>
+                                    <tbody>
+                                        {products.map((product) => (
+                                            <tr key={product._id}>
+                                                <td className="px-4 py-3">
+                                                    <img
+                                                        src={product.images?.[0] || 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=100'}
+                                                        alt={product.name}
+                                                        className="rounded-3"
+                                                        style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                                    />
+                                                </td>
+                                                <td className="py-3">
+                                                    <strong>{product.name}</strong>
+                                                </td>
+                                                <td className="py-3">
+                                                    <Badge bg="light" text="primary" className="px-3 py-2 rounded-pill">
+                                                        {product.category}
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-3 fw-bold">₹{product.price}</td>
+                                                <td className="py-3">
+                                                    <Badge bg={product.countInStock > 0 ? 'success' : 'danger'} className="px-3 py-2 rounded-pill">
+                                                        {product.countInStock > 0 ? `${product.countInStock} in stock` : 'Out of stock'}
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-3 text-center">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        className="me-2 rounded-pill px-3"
+                                                        onClick={() => handleEdit(product)}
+                                                    >
+                                                        <Edit2 size={14} className="me-1" /> Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        className="rounded-pill px-3"
+                                                        onClick={() => handleDelete(product)}
+                                                    >
+                                                        <Trash2 size={14} className="me-1" /> Delete
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        )}
+                    </Card>
+                ) : (
+                    <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+                        <Card.Header className="bg-white py-3 px-4 border-bottom">
+                            <h5 className="fw-bold mb-0">
+                                <Package size={20} className="me-2" /> Customer Orders
+                            </h5>
+                        </Card.Header>
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="table-responsive">
+                                <Table hover className="mb-0 align-middle">
+                                    <thead className="bg-light">
+                                        <tr>
+                                            <th className="px-4 py-3">Order ID</th>
+                                            <th className="py-3">Customer</th>
+                                            <th className="py-3">Date</th>
+                                            <th className="py-3">Total</th>
+                                            <th className="py-3">Paid</th>
+                                            <th className="py-3 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {orders.map((order) => (
+                                            <tr key={order.id}>
+                                                <td className="px-4 py-3 small text-muted">#{order.id.substring(0, 8)}...</td>
+                                                <td className="py-3 text-muted">User ID: {order.user.substring(0, 8)}...</td>
+                                                <td className="py-3">{new Date(order.createdAt).toLocaleDateString()}</td>
+                                                <td className="py-3 fw-bold">₹{order.totalPrice}</td>
+                                                <td className="py-3">
+                                                    <Badge bg={order.isPaid ? 'success' : 'danger'} className="px-3 py-2 rounded-pill">
+                                                        {order.isPaid ? 'Paid' : 'Unpaid'}
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-3 text-center">
+                                                    <Button variant="outline-primary" size="sm" className="rounded-pill px-3" onClick={() => navigate(`/order/${order.id}`)}>
+                                                        View Details
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {orders.length === 0 && (
+                                            <tr>
+                                                <td colSpan="6" className="text-center py-5 text-secondary">
+                                                    No orders found.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        )}
+                    </Card>
+                )}
 
                 {/* Edit/Add Modal */}
                 <Modal show={showEditModal || showAddModal} onHide={() => { setShowEditModal(false); setShowAddModal(false); }} size="lg" centered>

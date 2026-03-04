@@ -46,7 +46,7 @@ const LoginPage = () => {
                                 </Col>
                                 <Col md={6} className="p-4 p-lg-5">
                                     <div className="text-center mb-5">
-                                        <h2 className="fw-bold text-primary">DRESSME</h2>
+                                        <h2 className="fw-bold text-primary">DREAMEE SHAZ</h2>
                                         <p className="text-secondary">Welcome back! Please login to your account.</p>
                                     </div>
 
