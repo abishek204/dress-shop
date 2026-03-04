@@ -17,12 +17,13 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
 }));
 
 // Explicitly handle all OPTIONS requests for preflight
-app.options('*', cors());
+// cors() middleware above already handles OPTIONS preflight requests if configured properly
 
 // Serve static images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -40,5 +41,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
-app.listen(PORT, () => { console.log(`🚀 Indian Fashion Server active on port ${PORT}`); });
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Indian Fashion Server active on port ${PORT}`);
+    console.log(`📡 Listening on all network interfaces (0.0.0.0)`);
+});
 module.exports = app;
