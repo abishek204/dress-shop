@@ -34,3 +34,4 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.listen(PORT, () => { console.log(`🚀 Indian Fashion Server active on port ${PORT}`); });
+module.exports = app;
