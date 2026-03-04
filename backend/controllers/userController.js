@@ -28,12 +28,22 @@ const registerUser = async (req, res) => {
         });
 
         if (user) {
+            const token = generateToken(user.id);
+
+            // Set cookie for Vercel/Production
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' || true, // Always true for cross-site auth
+                sameSite: 'None', // Required for cross-site authentication
+                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+            });
+
             res.status(201).json({
                 _id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user.id),
+                token: token, // Keep returning token for backward compatibility
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -53,12 +63,22 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ where: { email } });
 
         if (user && (await user.matchPassword(password))) {
+            const token = generateToken(user.id);
+
+            // Set cookie for Vercel/Production
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' || true, // Always true for cross-site auth
+                sameSite: 'None', // Required for cross-site authentication
+                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+            });
+
             res.json({
                 _id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user.id),
+                token: token, // Keep returning token for backward compatibility
             });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
