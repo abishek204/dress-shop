@@ -1,4 +1,11 @@
 const dotenv = require('dotenv');
+// 🔋 Force SQLite Driver for Vercel Bundler
+try {
+    require('sqlite3');
+    console.log('📦 SQLite3 Driver Loaded');
+} catch (e) {
+    console.warn('⚠️ SQLite3 Driver not found in environment');
+}
 dotenv.config();
 
 const express = require('express');
