@@ -15,11 +15,37 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
+// List of allowed origins in production
+const allowedOrigins = [
+    'https://dress-shop-zrb9.vercel.app',
+    'https://dress-shop-xi.vercel.app',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+];
+
 app.use(cors({
-    origin: '*',
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Accept-Version',
+        'Content-Length',
+        'Content-MD5',
+        'Date',
+        'X-Api-Version'
+    ]
 }));
 
 // Explicitly handle all OPTIONS requests for preflight

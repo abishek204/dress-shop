@@ -18,7 +18,9 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         console.log('🔑 Attempting login for:', email);
         try {
-            const { data } = await api.post('/api/users/login', { email, password });
+            const response = await api.post('/api/users/login', { email, password });
+            const data = response.data;
+
             console.log('✅ Login successful:', data.name);
             setUser(data);
             localStorage.setItem('user', JSON.stringify(data));
@@ -32,14 +34,16 @@ export const AuthProvider = ({ children }) => {
     const register = async (name, email, password) => {
         console.log('📝 Attempting registration for:', email);
         try {
-            const { data } = await api.post('/api/users', { name, email, password });
+            const response = await api.post('/api/users', { name, email, password });
+            const data = response.data;
+
             console.log('✅ Registration successful:', data.name);
             setUser(data);
             localStorage.setItem('user', JSON.stringify(data));
             return { success: true };
         } catch (error) {
             console.error('❌ Registration failed:', error.message);
-            return { success: false, message: error.response?.data?.message || 'Registration failed: ' + error.message };
+            return { success: false, message: error.response?.data?.message || 'Registration failed' };
         }
     };
 
